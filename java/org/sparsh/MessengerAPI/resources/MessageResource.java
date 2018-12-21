@@ -18,6 +18,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.jersey.server.Uri;
+import org.sparsh.MessengerAPI.exception.DataNotFoundException;
 import org.sparsh.MessengerAPI.model.Message;
 import org.sparsh.MessengerAPI.service.MessageService;
 

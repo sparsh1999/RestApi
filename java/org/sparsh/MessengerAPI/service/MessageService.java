@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.sparsh.MessengerAPI.Database.DatabaseDemo;
+import org.sparsh.MessengerAPI.exception.DataNotFoundException;
 import org.sparsh.MessengerAPI.model.Message;
 import org.sparsh.MessengerAPI.model.Profile;
 
@@ -54,7 +55,12 @@ public class MessageService
 	   
 	   public Message getMessage(int id)
 	   {
-		   return message.get(id);
+		    Message messg =  message.get(id);
+			if (messg ==null)
+			{
+				throw  new DataNotFoundException("message with id "+id+" not found");
+			}
+		   return messg;
 	   }
 	   
 	   public Message updateMessage(Message mssg)
