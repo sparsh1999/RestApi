@@ -9,6 +9,11 @@ import javax.ws.rs.ext.Provider;
 //if we typecast the generic into Throwable here then it will catch all exceptions
 // however there is a herirachy for example if datanotfoundexception is called then it will be called
 
+// there are also some exceptions that jersey knows itself like WebApplicationException ,just return 
+// a response with it no need to make a class for it 
+// also WebApplicationException class is superclass of other class like RedirectException here 
+// just no need to even pass response 
+
 @Provider
 public class DataNotFoundExceptionMapper implements ExceptionMapper<DataNotFoundException> {
 

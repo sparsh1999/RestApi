@@ -1,6 +1,8 @@
 package org.sparsh.MessengerAPI.model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -17,8 +19,18 @@ public class Message
 	Date createdDate;
 	String author;
 	String message ;
+	List<Link> link = new ArrayList<>();
 	
-	 public Message ()
+	
+	public List<Link> getLink() {
+		return link;
+	}
+
+	public void setLink(List<Link> link) {
+		this.link = link;
+	}
+
+	public Message ()
 	{
 		
 	}
@@ -30,6 +42,7 @@ public class Message
 		 this.createdDate = new Date();
 		 this.author = author;
 	 }
+	 
 	 
 	public String getMessage() {
 		return message;
@@ -55,5 +68,15 @@ public class Message
 	public void setAuthor(String author) {
 		this.author = author;
 	}
+	
+	public void addLink(String uri,String rel)
+	{
+		Link link = new Link();
+		link.setLink(uri);
+		link.setRel(rel);
+		this.link.add(link);
+	}
+	
+	
 }
 

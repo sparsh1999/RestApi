@@ -11,11 +11,13 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.server.Uri;
 import org.sparsh.MessengerAPI.exception.DataNotFoundException;
@@ -47,12 +49,24 @@ public class MessageResource {
 //		return service.getAllMssg();
 //	}
 	
+	// Exception handling described on DataNotFoundExcption class
 	@GET
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Message getMessageById(@PathParam("id") int id)
 	{
-		return service.getMessage(id);
+		Message msg = service.getMessage(id);
+		Exception exception = new Exception("not found",404,"www.google.com");
+		Response response = Response.status(Status.NOT_FOUND).entity(exception).build();
+		
+		if (msg == null)
+		{
+		throw new WebApplicationException(response);
+		
+		// we can also throw directly RedirectException or any other subclass of WebApplicationException
+		// they have already implemented status code etc;
+		}
+		return msg;
 	}
 	
 	@DELETE
@@ -72,9 +86,32 @@ public class MessageResource {
 		// Responese.status(Status.value) can be used to only send status
 		// to not use hardcoded address like /message/1/comment we use a  URIinfo here
 		Message message = service.addMessage(mssg);
+		
+		// adding link 
+		 message.addLink(extractLink(uri, mssg).toString(), "self");
+		 message.addLink(getLinkForSubresource(mssg,uri), "comment");
+		 
+		return Response.created(extractLink(uri,mssg)).entity(message).build();
+	}
+
+	private String getLinkForSubresource(Message mssg, UriInfo uri) {
+
+	// for subresource we need to traverse the whole uri from parent to subresource 
+	// also there might be any pathParamenter so we need to resolve it use resolveTemplate()
+        URI uri1 = uri.getBaseUriBuilder().path(MessageResource.class)
+        		                          .path(MessageResource.class,"operateComments")
+        		                          .path(CommentResource.class)
+        		                          .resolveTemplate("id",mssg.getId())
+        		                          .build();
+        return uri1.toString();
+	}
+
+	private URI extractLink(UriInfo uri, Message message) {
+		
 		String newId = String.valueOf(message.getId());
+		//path(myResource.class) will return /message or class level path
 		URI uriNew = uri.getAbsolutePathBuilder().path(newId).build();
-		return Response.created(uriNew).entity(message).build();
+		return uriNew;
 	}
 	
 	@PUT
